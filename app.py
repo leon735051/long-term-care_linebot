@@ -22,10 +22,11 @@ with open('abc_point.json', 'r', encoding='utf-8') as file:
 PLACES = [
     {
         'name': item['機構名稱'],
-        'lat': item['緯度'],
-        'lon': item['經度']
+        'lat': float(item['緯度']),
+        'lon': float(item['經度'])
     } for item in data
 ]
+
 
 from math import sqrt
 
