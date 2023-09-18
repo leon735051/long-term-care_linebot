@@ -13,6 +13,22 @@ app = Flask(__name__)
 line_bot_api = LineBotApi(os.environ.get("CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.environ.get("CHANNEL_SECRET"))
 
+# 從 abc_point.json 讀取資料
+with open('abc_point.json', 'r', encoding='utf-8') as file:
+    data = json.load(file)
+
+PLACES = [
+    {
+        'name': item['機構名稱'],
+        'lat': item['緯度'],
+        'lon': item['經度']
+    } for item in data
+]
+
+from math import sqrt
+
+def get_distance(place, lat, lon):
+    return sqrt((place["lat"] - lat)**2 + (place["lon"] - lon)**2)
 
 @app.route("/", methods=["GET", "POST"])
 def callback():
@@ -29,20 +45,6 @@ def callback():
             abort(400)
 
         return "OK"
-
-
-# 先創建一個示例數據，存儲所有據點的位置
-PLACES = [
-    {"name": "醫院A", "lat": 25.0330, "lon": 121.5654},
-    {"name": "診所B", "lat": 24.9889, "lon": 121.5747},
-    {"name": "據點C", "lat": 25.0209, "lon": 121.5442},
-    # ... add more places
-]
-
-from math import sqrt
-
-def get_distance(place, lat, lon):
-    return sqrt((place["lat"] - lat)**2 + (place["lon"] - lon)**2)
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
