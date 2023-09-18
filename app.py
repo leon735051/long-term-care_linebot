@@ -1,14 +1,11 @@
 import os
 import json
-
 from datetime import datetime
-
 from flask import Flask, abort, request
-
-# https://github.com/line/line-bot-sdk-python
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage
+from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
 
@@ -19,23 +16,39 @@ handler = WebhookHandler(os.environ.get("CHANNEL_SECRET"))
 with open('abc_point.json', 'r', encoding='utf-8') as file:
     data = json.load(file)
 
+def safe_float_convert(value, default=0.0):
+    try:
+        return float(value)
+    except ValueError:
+        return default
+
 PLACES = [
     {
         'name': item['機構名稱'],
-        'lat': float(item['緯度']),
-        'lon': float(item['經度'])
+        'lat': safe_float_convert(item['緯度']),
+        'lon': safe_float_convert(item['經度'])
     } for item in data
 ]
 
-
-from math import sqrt
-
 def get_distance(place, lat, lon):
-    return sqrt((place["lat"] - lat)**2 + (place["lon"] - lon)**2)
+    R = 6371  # 地球的半徑（公里）
+    
+    lat1 = radians(place["lat"])
+    lon1 = radians(place["lon"])
+    lat2 = radians(lat)
+    lon2 = radians(lon)
+    
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    
+    distance = R * c
+    return distance
 
 @app.route("/", methods=["GET", "POST"])
 def callback():
-
     if request.method == "GET":
         return "Hello Heroku"
     if request.method == "POST":
@@ -52,9 +65,7 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     get_message = event.message.text
-
     reply = TextSendMessage(text=f"{get_message}132")
-
     line_bot_api.reply_message(event.reply_token, reply)
 
 @handler.add(MessageEvent, message=LocationMessage)
