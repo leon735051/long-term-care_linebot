@@ -82,5 +82,13 @@ def handle_location(event):
     for place, distance in closest_places:
         reply_text += f"{place['name']}，距離：{distance:.2f}公里\n"
 
+    # Generate OSM link with markers for the three places
+    base_osm_url = "https://www.openstreetmap.org"
+    markers = "&".join([f"mlat={place['lat']}&mlon={place['lon']}" for place, _ in closest_places])
+    osm_link = f"{base_osm_url}?{markers}#map=16/{user_lat}/{user_lon}"
+
+    reply_text += f"\n查看位置: {osm_link}"
+
     reply = TextSendMessage(text=reply_text)
     line_bot_api.reply_message(event.reply_token, reply)
+
