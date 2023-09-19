@@ -80,7 +80,7 @@ def handle_location(event):
 
     reply_text = "距離您最近的三個據點是：\n"
     for place, distance in closest_places:
-        reply_text += f"{place['name']}，距離：{distance:.2f}公里\n資料更新時間：{place['time']}\n"
+        reply_text += f"{place['name']}，距離：{distance:.2f}公里\n"
 
     reply = TextSendMessage(text=reply_text)
     line_bot_api.reply_message(event.reply_token, reply)
