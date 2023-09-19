@@ -22,14 +22,15 @@ def safe_float_convert(value, default=0.0):
     except ValueError:
         return default
 
-PLACES = [
-    {
-        'name': item['機構名稱'],
-        'time': item['最後異動時間'],
-        'lat': safe_float_convert(item['緯度']),
-        'lon': safe_float_convert(item['經度'])
-    } for item in data
-]
+unique_places = {}
+for item in data:
+    name = item['機構名稱']
+    lat = safe_float_convert(item['緯度'])
+    lon = safe_float_convert(item['經度'])
+    unique_places[name] = {'name': name, 'lat': lat, 'lon': lon}
+
+PLACES = list(unique_places.values())
+
 
 def get_distance(place, lat, lon):
     R = 6371  # 地球的半徑（公里）
