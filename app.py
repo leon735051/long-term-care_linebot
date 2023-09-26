@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
@@ -78,17 +78,60 @@ def handle_location(event):
     distances = [(place, get_distance(place, user_lat, user_lon)) for place in PLACES]
     closest_places = sorted(distances, key=lambda x: x[1])[:3]
 
-    reply_text = "距離您最近的三個據點是：\n"
+    bubbles = []
+
     for place, distance in closest_places:
-        reply_text += f"{place['name']}，距離：{distance:.2f}公里\n"
+        bubble = BubbleContainer(
+            body={
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                    {
+                        "type": "text",
+                        "text": place['name'],
+                        "weight": "bold",
+                        "size": "xl"
+                    },
+                    {
+                        "type": "box",
+                        "layout": "vertical",
+                        "margin": "lg",
+                        "spacing": "sm",
+                        "contents": [
+                            {
+                                "type": "box",
+                                "layout": "baseline",
+                                "spacing": "sm",
+                                "contents": [
+                                    {
+                                        "type": "text",
+                                        "text": "距離",
+                                        "color": "#aaaaaa",
+                                        "size": "sm",
+                                        "flex": 1
+                                    },
+                                    {
+                                        "type": "text",
+                                        "text": f"{distance:.2f} 公里",
+                                        "wrap": True,
+                                        "color": "#666666",
+                                        "size": "sm",
+                                        "flex": 5
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ]
+            }
+        )
+        bubbles.append(bubble)
 
-    # Generate OSM link with markers for the three places
-    base_osm_url = "https://www.openstreetmap.org"
-    markers = "&".join([f"mlat={place['lat']}&mlon={place['lon']}" for place, _ in closest_places])
-    osm_link = f"{base_osm_url}?{markers}#map=16/{user_lat}/{user_lon}"
+    flex_message = FlexSendMessage(
+        alt_text="距離您最近的三個據點",
+        contents=bubbles
+    )
+    
+    line_bot_api.reply_message(event.reply_token, flex_message)
 
-    reply_text += f"\n查看位置: {osm_link}"
-
-    reply = TextSendMessage(text=reply_text)
-    line_bot_api.reply_message(event.reply_token, reply)
 
