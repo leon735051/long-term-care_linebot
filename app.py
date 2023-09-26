@@ -100,7 +100,7 @@ def handle_location(event):
                         "type": "text",
                         "text": place['name'],
                         "weight": "bold",
-                        "size": "xl"
+                        "size": "lg"
                     },
                     {
                         "type": "text",
