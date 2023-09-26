@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
@@ -127,11 +127,11 @@ def handle_location(event):
         )
         bubbles.append(bubble)
 
+    carousel = CarouselContainer(contents=bubbles)
+
     flex_message = FlexSendMessage(
         alt_text="距離您最近的三個據點",
-        contents=bubbles
+        contents=carousel
     )
     
     line_bot_api.reply_message(event.reply_token, flex_message)
-
-
