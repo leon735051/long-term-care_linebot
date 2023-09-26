@@ -29,7 +29,13 @@ for item in data:
     phone = item['機構電話']
     lat = safe_float_convert(item['緯度'])
     lon = safe_float_convert(item['經度'])
-    unique_places[name] = {'name': name, 'lat': lat, 'lon': lon}
+    unique_places[name] = {
+        'name': name, 
+        'lat': lat, 
+        'lon': lon, 
+        'address': address,
+        'phone': phone
+    }
 
 PLACES = list(unique_places.values())
 
