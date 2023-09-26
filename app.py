@@ -129,15 +129,7 @@ def handle_location(event):
                                 "contents": [
                                     {
                                         "type": "text",
-                                        "text": "距離",
-                                        "color": "#0000FF",
-                                        "size": "sm",
-                                        "flex": 1,
-                                        "align": "center"    # 水平居中
-                                    },
-                                    {
-                                        "type": "text",
-                                        "text": f"{distance:.2f} 公里",
+                                        "text": f"距離你的位置{distance:.2f} 公里",
                                         "wrap": True,
                                         "color": "#0000FF",
                                         "size": "sm",
