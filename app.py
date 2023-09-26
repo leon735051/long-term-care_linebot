@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction
 from math import radians, sin, cos, sqrt, atan2
 
 app = Flask(__name__)
@@ -81,6 +81,8 @@ def handle_location(event):
     bubbles = []
 
     for place, distance in closest_places:
+        map_url = f"https://www.openstreetmap.org/?mlat={place['lat']}&mlon={place['lon']}#map=16/{place['lat']}/{place['lon']}"
+        
         bubble = BubbleContainer(
             body={
                 "type": "box",
@@ -105,7 +107,7 @@ def handle_location(event):
                                 "contents": [
                                     {
                                         "type": "text",
-                                        "text": "距離",
+                                        "text": "距离",
                                         "color": "#aaaaaa",
                                         "size": "sm",
                                         "flex": 1
@@ -119,6 +121,16 @@ def handle_location(event):
                                         "flex": 5
                                     }
                                 ]
+                            },
+                            {
+                                "type": "button",
+                                "style": "link",
+                                "height": "sm",
+                                "action": {
+                                    "type": "uri",
+                                    "label": "查看地图",
+                                    "uri": map_url
+                                }
                             }
                         ]
                     }
@@ -126,6 +138,7 @@ def handle_location(event):
             }
         )
         bubbles.append(bubble)
+
 
     carousel = CarouselContainer(contents=bubbles)
 
