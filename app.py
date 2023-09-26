@@ -25,6 +25,8 @@ def safe_float_convert(value, default=0.0):
 unique_places = {}
 for item in data:
     name = item['機構名稱']
+    address = item['地址全址']
+    phone = item['機構電話']
     lat = safe_float_convert(item['緯度'])
     lon = safe_float_convert(item['經度'])
     unique_places[name] = {'name': name, 'lat': lat, 'lon': lon}
@@ -95,6 +97,20 @@ def handle_location(event):
                         "size": "xl"
                     },
                     {
+                        "type": "text",
+                        "text": place['address'],
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm"
+                    },
+                    {
+                        "type": "text",
+                        "text": f"電話: {place['phone']}",
+                        "wrap": True,
+                        "color": "#666666",
+                        "size": "sm"
+                    },
+                    {
                         "type": "box",
                         "layout": "vertical",
                         "margin": "lg",
@@ -107,7 +123,7 @@ def handle_location(event):
                                 "contents": [
                                     {
                                         "type": "text",
-                                        "text": "距离",
+                                        "text": "距離",
                                         "color": "#aaaaaa",
                                         "size": "sm",
                                         "flex": 1
@@ -124,11 +140,12 @@ def handle_location(event):
                             },
                             {
                                 "type": "button",
-                                "style": "link",
+                                "style": "primary",
+                                "color": "#0000FF",  # 設定為藍色
                                 "height": "sm",
                                 "action": {
                                     "type": "uri",
-                                    "label": "查看地图",
+                                    "label": "查看地圖",
                                     "uri": map_url
                                 }
                             }
@@ -138,6 +155,7 @@ def handle_location(event):
             }
         )
         bubbles.append(bubble)
+
 
 
     carousel = CarouselContainer(contents=bubbles)
