@@ -4,8 +4,11 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction
 from math import radians, sin, cos, sqrt, atan2
+
+# 全局變量，用來保存用戶狀態
+user_states = {}
 
 app = Flask(__name__)
 
@@ -74,95 +77,134 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    user_id = event.source.user_id
     get_message = event.message.text
-    reply = TextSendMessage(text=f"{get_message}132")
+
+    # 當用戶輸入"查詢"時
+    if get_message == "查詢":
+        items = [
+            QuickReplyButton(action=MessageAction(label="ABC據點", text="ABC據點")),
+            QuickReplyButton(action=MessageAction(label="醫院", text="醫院")),
+            QuickReplyButton(action=MessageAction(label="診所", text="診所"))
+        ]
+        reply = TextSendMessage(text="請選擇查詢類型", quick_reply=QuickReply(items=items))
+    elif get_message in ["ABC據點", "醫院", "診所"]:
+        user_states[user_id] = get_message
+        reply = TextSendMessage(text="請回傳您的位資訊")
+    else:
+        reply = TextSendMessage(text=f"請輸入查詢")
+
     line_bot_api.reply_message(event.reply_token, reply)
 
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location(event):
-    user_lat = event.message.latitude
-    user_lon = event.message.longitude
+    user_id = event.source.user_id
+    if user_id not in user_states:
+        # 預設回應
+        reply = TextSendMessage(text="請先選擇查詢類型")
+        line_bot_api.reply_message(event.reply_token, reply)
+        return
 
-    distances = [(place, get_distance(place, user_lat, user_lon)) for place in PLACES]
-    closest_places = sorted(distances, key=lambda x: x[1])[:3]
+    if user_states[user_id] == "ABC據點":
+        # 使用ABC據點的資料來源進行查詢和回應
+        user_lat = event.message.latitude
+        user_lon = event.message.longitude
 
-    bubbles = []
+        distances = [(place, get_distance(place, user_lat, user_lon)) for place in PLACES]
+        closest_places = sorted(distances, key=lambda x: x[1])[:3]
 
-    for place, distance in closest_places:
-        map_url = f"https://www.openstreetmap.org/?mlat={place['lat']}&mlon={place['lon']}#map=16/{place['lat']}/{place['lon']}"
-        
-        bubble = BubbleContainer(
-            body={
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                    {
-                        "type": "text",
-                        "text": place['name'],
-                        "weight": "bold",
-                        "size": "lg"
-                    },
-                    {
-                        "type": "text",
-                        "text": place['address'],
-                        "wrap": True,
-                        "color": "#666666",
-                        "size": "sm"
-                    },
-                    {
-                        "type": "text",
-                        "text": f"電話: {place['phone']}",
-                        "wrap": True,
-                        "color": "#666666",
-                        "size": "sm"
-                    },
-                    {
-                        "type": "box",
-                        "layout": "vertical",
-                        "margin": "lg",
-                        "spacing": "sm",
-                        "contents": [
-                            {
-                                "type": "box",
-                                "layout": "baseline",
-                                "spacing": "sm",
-                                "contents": [
-                                    {
-                                        "type": "text",
-                                        "text": f"距離你的位置{distance:.2f} 公里",
-                                        "wrap": True,
-                                        "color": "#0000FF",
-                                        "size": "sm",
-                                        "flex": 5,
-                                        "align": "center"    # 水平居中
+        bubbles = []
+
+        for place, distance in closest_places:
+            map_url = f"https://www.openstreetmap.org/?mlat={place['lat']}&mlon={place['lon']}#map=16/{place['lat']}/{place['lon']}"
+            
+            bubble = BubbleContainer(
+                body={
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": place['name'],
+                            "weight": "bold",
+                            "size": "lg"
+                        },
+                        {
+                            "type": "text",
+                            "text": place['address'],
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"電話: {place['phone']}",
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "baseline",
+                                    "spacing": "sm",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"距離你的位置{distance:.2f} 公里",
+                                            "wrap": True,
+                                            "color": "#0000FF",
+                                            "size": "sm",
+                                            "flex": 5,
+                                            "align": "center"    # 水平居中
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "color": "#0000FF",  # 設定為藍色
+                                    "height": "sm",
+                                    "action": {
+                                        "type": "uri",
+                                        "label": "查看地圖",
+                                        "uri": map_url
                                     }
-                                ]
-                            },
-                            {
-                                "type": "button",
-                                "style": "primary",
-                                "color": "#0000FF",  # 設定為藍色
-                                "height": "sm",
-                                "action": {
-                                    "type": "uri",
-                                    "label": "查看地圖",
-                                    "uri": map_url
                                 }
-                            }
-                        ]
-                    }
-                ]
-            }
+                            ]
+                        }
+                    ]
+                }
+            )
+            bubbles.append(bubble)
+
+
+
+        carousel = CarouselContainer(contents=bubbles)
+
+        flex_message = FlexSendMessage(
+            alt_text="距離您最近的三個據點",
+            contents=carousel
         )
-        bubbles.append(bubble)
+        
+        line_bot_api.reply_message(event.reply_token, flex_message)
+        pass
+    elif user_states[user_id] == "醫院":
+        # 使用醫院的資料來源進行查詢和回應
+        # TODO: 根據醫院資料來源處理位置資訊
+        pass
+    elif user_states[user_id] == "診所":
+        # 使用診所的資料來源進行查詢和回應
+        # TODO: 根據診所資料來源處理位置資訊
+        pass
 
+    del user_states[user_id]  # 處理完畢後，清除用戶狀態
 
+@handler.add(MessageEvent, message=LocationMessage)
+def handle_location(event):
 
-    carousel = CarouselContainer(contents=bubbles)
-
-    flex_message = FlexSendMessage(
-        alt_text="距離您最近的三個據點",
-        contents=carousel
-    )
-    
-    line_bot_api.reply_message(event.reply_token, flex_message)
