@@ -205,6 +205,3 @@ def handle_location(event):
 
     del user_states[user_id]  # 處理完畢後，清除用戶狀態
 
-@handler.add(MessageEvent, message=LocationMessage)
-def handle_location(event):
-
