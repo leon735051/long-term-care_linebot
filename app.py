@@ -57,10 +57,6 @@ with open('健保特約醫事機構-診所_座標結果.csv', mode='r', encoding
             'url': url
         })
 
-CLINIC_PLACES = load_clinic_data('健保特約醫事機構-診所_座標結果.csv')
-
-
-
 def get_distance(place, lat, lon):
     R = 6371  # 地球的半徑（公里）
     
