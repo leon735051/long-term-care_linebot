@@ -47,7 +47,7 @@ with open('健保特約醫事機構-診所_座標結果.csv', mode='r', encoding
     reader = csv.reader(file)
     next(reader)  # Skip header row
     for row in reader:
-        code, name, type_, phone, address, _, _, _, _, _, _, _, _, _, url, lat, lon = row
+        code, name, type_, phone, address, _, _, _, _, _, _, _, _, _, url, lon, lat = row
         clinic_data.append({
             'name': name, 
             'lat': safe_float_convert(lat), 
