@@ -6,7 +6,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction
 from math import radians, sin, cos, sqrt, atan2
-
+import csv
 # 全局變量，用來保存用戶狀態
 user_states = {}
 
@@ -39,6 +39,21 @@ for item in data:
         'address': address,
         'phone': phone
     }
+
+# Read Clinic Data from CSV
+clinic_data = []
+with open("健保特約醫事機構-診所_座標結果.csv", mode='r', encoding='utf-8') as file:
+    reader = csv.DictReader(file)
+    for row in reader:
+        lat = safe_float_convert(row['latitude'])
+        lon = safe_float_convert(row['longitude'])
+        clinic_data.append({
+            'name': row['醫事機構名稱'],
+            'lat': lat, 
+            'lon': lon, 
+            'address': row['地址'],
+            'phone': row['電話']
+        })
 
 PLACES = list(unique_places.values())
 
@@ -200,8 +215,29 @@ def handle_location(event):
         pass
     elif user_states[user_id] == "診所":
         # 使用診所的資料來源進行查詢和回應
-        # TODO: 根據診所資料來源處理位置資訊
-        pass
+        user_lat = event.message.latitude
+        user_lon = event.message.longitude
+
+        distances = [(clinic, get_distance(clinic, user_lat, user_lon)) for clinic in clinic_data]
+        closest_clinics = sorted(distances, key=lambda x: x[1])[:3]
+
+        bubbles = []
+
+        for clinic, distance in closest_clinics:
+            map_url = f"https://www.google.com/maps/place?q={clinic['lat']},{clinic['lon']}"
+            bubble = BubbleContainer(
+                # ... (內容與ABC據點相似，可根據需求調整)
+            )
+            bubbles.append(bubble)
+
+        carousel = CarouselContainer(contents=bubbles)
+
+        flex_message = FlexSendMessage(
+            alt_text="距離您最近的三個診所",
+            contents=carousel
+        )
+        
+        line_bot_api.reply_message(event.reply_token, flex_message)
 
     del user_states[user_id]  # 處理完畢後，清除用戶狀態
 
