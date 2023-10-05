@@ -40,22 +40,25 @@ for item in data:
         'phone': phone
     }
 
-# Read Clinic Data from CSV
+PLACES = list(unique_places.values())
+
 clinic_data = []
-with open("健保特約醫事機構-診所_座標結果.csv", mode='r', encoding='utf-8') as file:
-    reader = csv.DictReader(file)
+with open('健保特約醫事機構-診所_座標結果.csv', mode='r', encoding='utf-8') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip header row
     for row in reader:
-        lat = safe_float_convert(row['latitude'])
-        lon = safe_float_convert(row['longitude'])
+        code, name, type_, phone, address, _, _, _, _, _, _, _, _, _, url, lat, lon = row
         clinic_data.append({
-            'name': row['醫事機構名稱'],
-            'lat': lat, 
-            'lon': lon, 
-            'address': row['地址'],
-            'phone': row['電話']
+            'name': name, 
+            'lat': safe_float_convert(lat), 
+            'lon': safe_float_convert(lon), 
+            'address': address,
+            'phone': phone,
+            'url': url
         })
 
-PLACES = list(unique_places.values())
+CLINIC_PLACES = load_clinic_data('健保特約醫事機構-診所_座標結果.csv')
+
 
 
 def get_distance(place, lat, lon):
@@ -119,16 +122,14 @@ def handle_location(event):
         reply = TextSendMessage(text="請先選擇查詢類型")
         line_bot_api.reply_message(event.reply_token, reply)
         return
-
+    user_lat = event.message.latitude
+    user_lon = event.message.longitude
+    distances = []
+    closest_places = []
+    bubbles = []
     if user_states[user_id] == "ABC據點":
-        # 使用ABC據點的資料來源進行查詢和回應
-        user_lat = event.message.latitude
-        user_lon = event.message.longitude
-
         distances = [(place, get_distance(place, user_lat, user_lon)) for place in PLACES]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]
-
-        bubbles = []
 
         for place, distance in closest_places:
             map_url = f"https://www.openstreetmap.org/?mlat={place['lat']}&mlon={place['lon']}#map=16/{place['lat']}/{place['lon']}"
@@ -214,19 +215,74 @@ def handle_location(event):
         # TODO: 根據醫院資料來源處理位置資訊
         pass
     elif user_states[user_id] == "診所":
-        # 使用診所的資料來源進行查詢和回應
-        user_lat = event.message.latitude
-        user_lon = event.message.longitude
-
         distances = [(clinic, get_distance(clinic, user_lat, user_lon)) for clinic in clinic_data]
-        closest_clinics = sorted(distances, key=lambda x: x[1])[:3]
+        closest_places = sorted(distances, key=lambda x: x[1])[:3]
 
-        bubbles = []
-
-        for clinic, distance in closest_clinics:
-            map_url = f"https://www.google.com/maps/place?q={clinic['lat']},{clinic['lon']}"
+        for clinic, distance in closest_places:
+            map_url = f"https://www.openstreetmap.org/?mlat={clinic['lat']}&mlon={clinic['lon']}#map=16/{clinic['lat']}/{clinic['lon']}"
+            
             bubble = BubbleContainer(
-                # ... (內容與ABC據點相似，可根據需求調整)
+                body={
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": clinic['name'],
+                            "weight": "bold",
+                            "size": "lg"
+                        },
+                        {
+                            "type": "text",
+                            "text": clinic['address'],
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"電話: {clinic['phone']}",
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "baseline",
+                                    "spacing": "sm",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"距離你的位置{distance:.2f} 公里",
+                                            "wrap": True,
+                                            "color": "#0000FF",
+                                            "size": "sm",
+                                            "flex": 5,
+                                            "align": "center"    # 水平居中
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "color": "#0000FF",  # 設定為藍色
+                                    "height": "sm",
+                                    "action": {
+                                        "type": "uri",
+                                        "label": "查看地圖",
+                                        "uri": map_url
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
             )
             bubbles.append(bubble)
 
