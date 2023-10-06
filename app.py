@@ -220,7 +220,8 @@ def handle_location(event):
         )
         
         line_bot_api.reply_message(event.reply_token, flex_message)
-
+        if user_id in user_states:
+            del user_states[user_id]
     elif user_states[user_id] == "醫院":
         distances = [(district, get_distance(district, user_lat, user_lon)) for district in district_hospital_data]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]
@@ -300,6 +301,8 @@ def handle_location(event):
         )
         
         line_bot_api.reply_message(event.reply_token, flex_message)
+        if user_id in user_states:
+            del user_states[user_id]
     elif user_states[user_id] == "診所":
         distances = [(clinic, get_distance(clinic, user_lat, user_lon)) for clinic in clinic_data]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]
@@ -380,6 +383,6 @@ def handle_location(event):
         )
         
         line_bot_api.reply_message(event.reply_token, flex_message)
-
-    del user_states[user_id]  # 處理完畢後，清除用戶狀態
+        if user_id in user_states:
+            del user_states[user_id]
 
