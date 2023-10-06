@@ -110,7 +110,7 @@ def handle_message(event):
     get_message = event.message.text
 
     # 當用戶輸入"查詢"時
-    if user_message.lower() in ["查詢", "search"]:
+    if get_message == "查詢":
         buttons_template_message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
