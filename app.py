@@ -147,8 +147,29 @@ def handle_location(event):
     user_id = event.source.user_id
     if user_id not in user_states:
         # 預設回應
-        reply = TextSendMessage(text="請先選擇查詢類型")
-        line_bot_api.reply_message(event.reply_token, reply)
+        buttons_template_message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+#                 thumbnail_image_url='YOUR_THUMBNAIL_IMAGE_URL',  # Optional
+                title='請選擇查詢類型',
+                text='您想要查詢哪種資訊？',
+                actions=[
+                    MessageAction(
+                        label='ABC據點',
+                        text='ABC據點'
+                    ),
+                    MessageAction(
+                        label='醫院',
+                        text='醫院'
+                    ),
+                    MessageAction(
+                        label='診所',
+                        text='診所'
+                    )
+                ]
+            )
+        )
+        line_bot_api.reply_message(event.reply_token, buttons_template_message)
         return
     user_lat = event.message.latitude
     user_lon = event.message.longitude
