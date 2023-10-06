@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction,TemplateSendMessage, CarouselTemplate, CarouselColumn, PostbackAction
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction,TemplateSendMessage, ButtonsTemplate
 from math import radians, sin, cos, sqrt, atan2
 import csv
 # 全局變量，用來保存用戶狀態
@@ -110,47 +110,30 @@ def handle_message(event):
     get_message = event.message.text
 
     # 當用戶輸入"查詢"時
-    if get_message == "查詢":
-        columns = [
-            CarouselColumn(
+    if user_message.lower() in ["查詢", "search"]:
+        buttons_template_message = TemplateSendMessage(
+            alt_text='Buttons template',
+            template=ButtonsTemplate(
+#                 thumbnail_image_url='YOUR_THUMBNAIL_IMAGE_URL',  # Optional
                 title='請選擇查詢類型',
-                text='ABC據點',
+                text='您想要查詢哪種資訊？',
                 actions=[
                     MessageAction(
-                        label='查詢ABC據點',
+                        label='ABC據點',
                         text='ABC據點'
-                    )
-                ]
-            ),
-            CarouselColumn(
-                title='請選擇查詢類型',
-                text='醫院',
-                actions=[
+                    ),
                     MessageAction(
-                        label='查詢醫院',
+                        label='醫院',
                         text='醫院'
-                    )
-                ]
-            ),
-            CarouselColumn(
-                title='請選擇查詢類型',
-                text='診所',
-                actions=[
+                    ),
                     MessageAction(
-                        label='查詢診所',
+                        label='診所',
                         text='診所'
                     )
                 ]
             )
-        ]
-        
-        carousel_template_message = TemplateSendMessage(
-            alt_text='Carousel template',
-            template=CarouselTemplate(
-                columns=columns
-            )
         )
-        line_bot_api.reply_message(event.reply_token, carousel_template_message)
+        line_bot_api.reply_message(event.reply_token, buttons_template_message)
     elif get_message in ["ABC據點", "醫院", "診所"]:
         user_states[user_id] = get_message
         reply = TextSendMessage(text="請回傳您的位資訊")
