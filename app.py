@@ -8,7 +8,7 @@ from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationM
 from math import radians, sin, cos, sqrt, atan2
 import csv
 # 全局變量，用來保存用戶狀態
-user_states = {}
+user_states_lock = threading.Lock()
 
 app = Flask(__name__)
 
@@ -118,7 +118,8 @@ def handle_message(event):
         ]
         reply = TextSendMessage(text="請選擇查詢類型", quick_reply=QuickReply(items=items))
     elif get_message in ["ABC據點", "醫院", "診所"]:
-        user_states[user_id] = get_message
+        with user_states_lock:
+            user_states[user_id] = get_message
         reply = TextSendMessage(text="請回傳您的位資訊")
     else:
         reply = TextSendMessage(text=f"請輸入查詢")
@@ -128,11 +129,12 @@ def handle_message(event):
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location(event):
     user_id = event.source.user_id
-    if user_id not in user_states:
-        # 預設回應
-        reply = TextSendMessage(text="請先選擇查詢類型")
-        line_bot_api.reply_message(event.reply_token, reply)
-        return
+    with user_states_lock:
+        if user_id not in user_states:
+            # 預設回應
+            reply = TextSendMessage(text="請先選擇查詢類型")
+            line_bot_api.reply_message(event.reply_token, reply)
+            return
     user_lat = event.message.latitude
     user_lon = event.message.longitude
     distances = []
@@ -220,7 +222,7 @@ def handle_location(event):
         )
         
         line_bot_api.reply_message(event.reply_token, flex_message)
-        pass
+
     elif user_states[user_id] == "醫院":
         distances = [(district, get_distance(district, user_lat, user_lon)) for district in district_hospital_data]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]
