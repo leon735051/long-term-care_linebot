@@ -56,6 +56,21 @@ with open('健保特約醫事機構-診所_座標結果.csv', mode='r', encoding
             'phone': phone,
             'url': url
         })
+        
+district_hospital_data = []
+with open('健保特約醫事機構-地區醫院_座標結果.csv', mode='r', encoding='utf-8') as file:
+    reader = csv.reader(file)
+    next(reader)  # Skip header row
+    for row in reader:
+        code, name, type_, phone, address, _, _, _, _, _, _, _, _, _, url, lon, lat = row
+        district_hospital_data.append({
+            'name': name, 
+            'lat': safe_float_convert(lat), 
+            'lon': safe_float_convert(lon), 
+            'address': address,
+            'phone': phone,
+            'url': url
+        })
 
 def get_distance(place, lat, lon):
     R = 6371  # 地球的半徑（公里）
@@ -207,9 +222,84 @@ def handle_location(event):
         line_bot_api.reply_message(event.reply_token, flex_message)
         pass
     elif user_states[user_id] == "醫院":
-        # 使用醫院的資料來源進行查詢和回應
-        # TODO: 根據醫院資料來源處理位置資訊
-        pass
+        distances = [(district, get_distance(district, user_lat, user_lon)) for district in district_hospital_data]
+        closest_places = sorted(distances, key=lambda x: x[1])[:3]
+        for district, distance in closest_places:
+            map_url = f"https://www.openstreetmap.org/?mlat={clinic['lat']}&mlon={clinic['lon']}#map=16/{clinic['lat']}/{clinic['lon']}"
+            
+            bubble = BubbleContainer(
+                body={
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [
+                        {
+                            "type": "text",
+                            "text": district['name'],
+                            "weight": "bold",
+                            "size": "lg"
+                        },
+                        {
+                            "type": "text",
+                            "text": district['address'],
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "text",
+                            "text": f"電話: {district['phone']}",
+                            "wrap": True,
+                            "color": "#666666",
+                            "size": "sm"
+                        },
+                        {
+                            "type": "box",
+                            "layout": "vertical",
+                            "margin": "lg",
+                            "spacing": "sm",
+                            "contents": [
+                                {
+                                    "type": "box",
+                                    "layout": "baseline",
+                                    "spacing": "sm",
+                                    "contents": [
+                                        {
+                                            "type": "text",
+                                            "text": f"距離你的位置{distance:.2f} 公里",
+                                            "wrap": True,
+                                            "color": "#0000FF",
+                                            "size": "sm",
+                                            "flex": 5,
+                                            "align": "center"    # 水平居中
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "button",
+                                    "style": "primary",
+                                    "color": "#0000FF",  # 設定為藍色
+                                    "height": "sm",
+                                    "action": {
+                                        "type": "uri",
+                                        "label": "查看地圖",
+                                        "uri": map_url
+                                    }
+                                }
+                            ]
+                        }
+                    ]
+                }
+            )
+            bubbles.append(bubble)
+
+        carousel = CarouselContainer(contents=bubbles)
+
+        flex_message = FlexSendMessage(
+            alt_text="距離您最近的三個醫院",
+            contents=carousel
+        )
+        
+        line_bot_api.reply_message(event.reply_token, flex_message)
     elif user_states[user_id] == "診所":
         distances = [(clinic, get_distance(clinic, user_lat, user_lon)) for clinic in clinic_data]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]

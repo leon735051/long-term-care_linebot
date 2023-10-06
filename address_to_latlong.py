@@ -5,7 +5,7 @@ import time
 import random
 
 # 載入資料
-file_path = "健保特約醫事機構-診所_健保特約醫事機構-診所.csv"
+file_path = "健保特約醫事機構-地區醫院_ 健保特約醫事機構_地區醫院.csv"
 df = pd.read_csv(file_path)
 
 # 建立 Google Maps URL
@@ -36,4 +36,4 @@ for i, row in df.iterrows():
         df.at[i, "longitude"] = None
 
 # 儲存結果
-df.to_csv("健保特約醫事機構-診所_座標結果.csv", index=False)
+df.to_csv("健保特約醫事機構-地區醫院_座標結果.csv", index=False)
