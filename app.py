@@ -225,7 +225,7 @@ def handle_location(event):
         distances = [(district, get_distance(district, user_lat, user_lon)) for district in district_hospital_data]
         closest_places = sorted(distances, key=lambda x: x[1])[:3]
         for district, distance in closest_places:
-            map_url = f"https://www.openstreetmap.org/?mlat={clinic['lat']}&mlon={clinic['lon']}#map=16/{clinic['lat']}/{clinic['lon']}"
+            map_url = f"https://www.openstreetmap.org/?mlat={district['lat']}&mlon={district['lon']}#map=16/{district['lat']}/{district['lon']}"
             
             bubble = BubbleContainer(
                 body={
