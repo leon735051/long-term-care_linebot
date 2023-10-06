@@ -151,7 +151,7 @@ def handle_location(event):
             alt_text='Buttons template',
             template=ButtonsTemplate(
 #                 thumbnail_image_url='YOUR_THUMBNAIL_IMAGE_URL',  # Optional
-                title='請選擇查詢類型',
+                title='網路延遲，請重新選擇查詢類型',
                 text='您想要查詢哪種資訊？',
                 actions=[
                     MessageAction(
