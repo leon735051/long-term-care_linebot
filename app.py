@@ -137,10 +137,10 @@ def handle_message(event):
     elif get_message in ["ABC據點", "醫院", "診所"]:
         user_states[user_id] = get_message
         reply = TextSendMessage(text="請回傳您的位資訊")
+        line_bot_api.reply_message(event.reply_token, reply)
     else:
         reply = TextSendMessage(text=f"請輸入查詢")
-
-    line_bot_api.reply_message(event.reply_token, reply)
+        line_bot_api.reply_message(event.reply_token, reply)
 
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location(event):
