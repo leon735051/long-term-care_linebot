@@ -111,37 +111,39 @@ def handle_message(event):
 
     # 當用戶輸入"查詢"時
     if get_message == "查詢":
-        buttons_template_message = TemplateSendMessage(
-            alt_text='Buttons template',
-            template=ButtonsTemplate(
-#                 thumbnail_image_url='YOUR_THUMBNAIL_IMAGE_URL',  # Optional
-                title='請選擇查詢類型',
-                text='您想要查詢哪種資訊？',
-                actions=[
-                    MessageAction(
-                        label='ABC據點',
-                        text='ABC據點'
-                    ),
-                    MessageAction(
-                        label='醫院',
-                        text='醫院'
-                    ),
-                    MessageAction(
-                        label='診所',
-                        text='診所'
-                    )
-                ]
+        try:
+            buttons_template_message = TemplateSendMessage(
+                alt_text='Buttons template',
+                template=ButtonsTemplate(
+    #                 thumbnail_image_url='YOUR_THUMBNAIL_IMAGE_URL',  # Optional
+                    title='請選擇查詢類型',
+                    text='您想要查詢哪種資訊？',
+                    actions=[
+                        MessageAction(
+                            label='ABC據點',
+                            text='ABC據點'
+                        ),
+                        MessageAction(
+                            label='醫院',
+                            text='醫院'
+                        ),
+                        MessageAction(
+                            label='診所',
+                            text='診所'
+                        )
+                    ]
+                )
             )
-        )
-        line_bot_api.reply_message(event.reply_token, buttons_template_message)
-    elif get_message in ["ABC據點", "醫院", "診所"]:
-        user_states[user_id] = get_message
-        reply = TextSendMessage(text="請回傳您的位資訊")
-        line_bot_api.reply_message(event.reply_token, reply)
-    else:
-        reply = TextSendMessage(text=f"請輸入查詢")
-        line_bot_api.reply_message(event.reply_token, reply)
-
+            line_bot_api.reply_message(event.reply_token, buttons_template_message)
+        elif get_message in ["ABC據點", "醫院", "診所"]:
+            user_states[user_id] = get_message
+            reply = TextSendMessage(text="請回傳您的位資訊")
+            line_bot_api.reply_message(event.reply_token, reply)
+        else:
+            reply = TextSendMessage(text=f"請輸入查詢")
+            line_bot_api.reply_message(event.reply_token, reply)
+        except Exception as e:  # 如果發生錯誤，執行下列代碼
+            print(f"Error: {str(e)}")  # 打印錯誤信息
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location(event):
     user_id = event.source.user_id
