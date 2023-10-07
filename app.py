@@ -106,12 +106,12 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
-    user_id = event.source.user_id
-    get_message = event.message.text
+    try:
+        user_id = event.source.user_id
+        get_message = event.message.text
 
-    # 當用戶輸入"查詢"時
-    if get_message == "查詢":
-        try:
+        # 當用戶輸入"查詢"時
+        if get_message == "查詢":
             buttons_template_message = TemplateSendMessage(
                 alt_text='Buttons template',
                 template=ButtonsTemplate(
@@ -142,8 +142,8 @@ def handle_message(event):
         else:
             reply = TextSendMessage(text=f"請輸入查詢")
             line_bot_api.reply_message(event.reply_token, reply)
-        except Exception as e:  # 如果發生錯誤，執行下列代碼
-            print(f"Error: {str(e)}")  # 打印錯誤信息
+    except Exception as e:  # 如果發生錯誤，執行下列代碼
+        print(f"Error: {str(e)}")  # 打印錯誤信息
 @handler.add(MessageEvent, message=LocationMessage)
 def handle_location(event):
     user_id = event.source.user_id
