@@ -105,7 +105,7 @@ def callback():
         return "OK"
 
 @handler.add(MessageEvent, message=TextMessage)
-def handle_message(event):
+async def handle_message(event):
     user_id = event.source.user_id
     get_message = event.message.text
 
