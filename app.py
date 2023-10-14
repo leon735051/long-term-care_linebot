@@ -111,7 +111,7 @@ def handle_message(event):
         get_message = event.message.text
 
         # 當用戶輸入"查詢"時
-        if get_message == "查詢":
+        if get_message == "照護資源查詢":
             buttons_template_message = TemplateSendMessage(
                 alt_text='Buttons template',
                 template=ButtonsTemplate(
