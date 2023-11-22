@@ -110,7 +110,7 @@ def handle_message(event):
     get_message = event.message.text
 
     # 當用戶輸入"查詢"時
-    if get_message == "查詢":
+    if get_message == "照護資源查詢":
         buttons_template_message = TemplateSendMessage(
             alt_text='Buttons template',
             template=ButtonsTemplate(
@@ -136,7 +136,7 @@ def handle_message(event):
         line_bot_api.reply_message(event.reply_token, buttons_template_message)
     elif get_message in ["ABC據點", "醫院", "診所"]:
         user_states[user_id] = get_message
-        reply = TextSendMessage(text="請回傳您的位資訊")
+        reply = TextSendMessage(text="請回傳您的位置資訊")
         line_bot_api.reply_message(event.reply_token, reply)
     else:
         reply = TextSendMessage(text=f"請輸入查詢")
