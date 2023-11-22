@@ -192,39 +192,39 @@ def handle_location(event):
                             "type": "text",
                             "text": place['name'],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "xxl"
                         },
                         {
                             "type": "text",
                             "text": place['address'],
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "text",
                             "text": f"電話: {place['phone']}",
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "box",
                             "layout": "vertical",
-                            "margin": "lg",
-                            "spacing": "md",
+                            "margin": "xl",
+                            "spacing": "lg",
                             "contents": [
                                 {
                                     "type": "box",
                                     "layout": "baseline",
-                                    "spacing": "md",
+                                    "spacing": "lg",
                                     "contents": [
                                         {
                                             "type": "text",
                                             "text": f"距離你的位置{distance:.2f} 公里",
                                             "wrap": True,
                                             "color": "#0000FF",
-                                            "size": "md",
+                                            "size": "lg",
                                             "flex": 5,
                                             "align": "center"    # 水平居中
                                         }
@@ -234,7 +234,7 @@ def handle_location(event):
                                     "type": "button",
                                     "style": "primary",
                                     "color": "#0000FF",  # 設定為藍色
-                                    "height": "md",
+                                    "height": "lg",
                                     "action": {
                                         "type": "uri",
                                         "label": "查看地圖",
@@ -274,39 +274,39 @@ def handle_location(event):
                             "type": "text",
                             "text": district['name'],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "xxl"
                         },
                         {
                             "type": "text",
                             "text": district['address'],
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "text",
                             "text": f"電話: {district['phone']}",
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "box",
                             "layout": "vertical",
-                            "margin": "xl",
-                            "spacing": "md",
+                            "margin": "xxl",
+                            "spacing": "lg",
                             "contents": [
                                 {
                                     "type": "box",
                                     "layout": "baseline",
-                                    "spacing": "md",
+                                    "spacing": "lg",
                                     "contents": [
                                         {
                                             "type": "text",
                                             "text": f"距離你的位置{distance:.2f} 公里",
                                             "wrap": True,
                                             "color": "#0000FF",
-                                            "size": "md",
+                                            "size": "lg",
                                             "flex": 5,
                                             "align": "center"    # 水平居中
                                         }
@@ -316,7 +316,7 @@ def handle_location(event):
                                     "type": "button",
                                     "style": "primary",
                                     "color": "#0000FF",  # 設定為藍色
-                                    "height": "md",
+                                    "height": "lg",
                                     "action": {
                                         "type": "uri",
                                         "label": "查看地圖",
@@ -354,39 +354,39 @@ def handle_location(event):
                             "type": "text",
                             "text": clinic['name'],
                             "weight": "bold",
-                            "size": "xl"
+                            "size": "xxl"
                         },
                         {
                             "type": "text",
                             "text": clinic['address'],
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "text",
                             "text": f"電話: {clinic['phone']}",
                             "wrap": True,
                             "color": "#666666",
-                            "size": "md"
+                            "size": "lg"
                         },
                         {
                             "type": "box",
                             "layout": "vertical",
-                            "margin": "xl",
-                            "spacing": "md",
+                            "margin": "xxl",
+                            "spacing": "lg",
                             "contents": [
                                 {
                                     "type": "box",
                                     "layout": "baseline",
-                                    "spacing": "md",
+                                    "spacing": "lg",
                                     "contents": [
                                         {
                                             "type": "text",
                                             "text": f"距離你的位置{distance:.2f} 公里",
                                             "wrap": True,
                                             "color": "#0000FF",
-                                            "size": "md",
+                                            "size": "lg",
                                             "flex": 5,
                                             "align": "center"    # 水平居中
                                         }
@@ -396,7 +396,7 @@ def handle_location(event):
                                     "type": "button",
                                     "style": "primary",
                                     "color": "#0000FF",  # 設定為藍色
-                                    "height": "md",
+                                    "height": "lg",
                                     "action": {
                                         "type": "uri",
                                         "label": "查看地圖",
