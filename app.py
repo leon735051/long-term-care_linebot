@@ -4,7 +4,7 @@ from datetime import datetime
 from flask import Flask, abort, request
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction,TemplateSendMessage, ButtonsTemplate
+from linebot.models import MessageEvent, TextMessage, TextSendMessage, LocationMessage, FlexSendMessage, BubbleContainer, CarouselContainer, ButtonComponent, URIAction, QuickReply, QuickReplyButton, MessageAction,TemplateSendMessage, ButtonsTemplate, BoxComponent
 from math import radians, sin, cos, sqrt, atan2
 import csv
 # 全局變量，用來保存用戶狀態
