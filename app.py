@@ -318,7 +318,7 @@ def handle_location(event):
                                             "type": "text",
                                             "text": f"距離你的位置{distance:.2f} 公里",
                                             "wrap": True,
-                                            "color": "#0000FF",
+                                            "color": "#334A5D",
                                             "size": "md",
                                             "flex": 5,
                                             "align": "center"    # 水平居中
@@ -327,8 +327,8 @@ def handle_location(event):
                                 },
                                 {
                                     "type": "button",
-                                    "style": "primary",
-                                    "color": "#0000FF",  # 設定為藍色
+                                    "style": "secondary",
+#                                     "color": "#0000FF",  # 設定為藍色
                                     "height": "md",
                                     "action": {
                                         "type": "uri",
@@ -398,7 +398,7 @@ def handle_location(event):
                                             "type": "text",
                                             "text": f"距離你的位置{distance:.2f} 公里",
                                             "wrap": True,
-                                            "color": "#0000FF",
+                                            "color": "#334A5D",
                                             "size": "md",
                                             "flex": 5,
                                             "align": "center"    # 水平居中
@@ -407,8 +407,8 @@ def handle_location(event):
                                 },
                                 {
                                     "type": "button",
-                                    "style": "primary",
-                                    "color": "#0000FF",  # 設定為藍色
+                                    "style": "secondary",
+#                                     "color": "#0000FF",  # 設定為藍色
                                     "height": "md",
                                     "action": {
                                         "type": "uri",
